@@ -8,17 +8,18 @@ def fuzzer
         puts "\rselect a wordlist:"
         wordlist_option = gets.chomp
         print wordlist_option
-        wordlist = File.open(wordlist_option)
-        wordlist.each do |dir|
+        wordlist = Array(File.open(wordlist_option))
+        ohyes = wordlist.map {|x| x.chomp }
+        ohyes.each do |dir|
             uri = "#{fuzz_option}/#{dir}/"
             request = HTTP.get(uri)
             print request.code
             if request.code == 200
                 puts "\rdirectory open! '#{dir}'"
             elsif request.code == 404
-                puts "\nscanning..."                       #directory closed
+                puts "\rscanning..."       #directory closed
             end
-        end
+        end        
     rescue Errno::ENOENT
         puts "\rERROR: Select a valid wordlist"
         return false
