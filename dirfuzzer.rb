@@ -1,31 +1,64 @@
 require 'http'
 
-def fuzzer
-    begin
-        puts "\rlink:"
-        fuzz_option = gets.chomp
-        print fuzz_option
-        puts "\rselect a wordlist:"
-        wordlist_option = gets.chomp
-        print wordlist_option
-        wordlist = Array(File.open(wordlist_option))
-        ohyes = wordlist.map {|x| x.chomp }
-        ohyes.each do |dir|
-            uri = "#{fuzz_option}/#{dir}/"
-            request = HTTP.get(uri)
-            print request.code
-            if request.code == 200
-                puts "\rdirectory open! '#{dir}'"
-            elsif request.code == 404
-                puts "\rscanning..."       #directory closed
-            end
-        end        
-    rescue Errno::ENOENT
-        puts "\rERROR: Select a valid wordlist"
-        return false
-    rescue HTTP::ConnectionError
-        puts "\rERROR: Select a valid link"
-        return false
+def check(string)
+    if string.match(/^http/)
+        isvalid = true
+        return isvalid
+    end
+    if !string.match(/^http/)
+        isvalid = false
+        print "Invalid URL: #{a}"
     end
 end
-print fuzzer
+
+def log(dir)
+    
+    log = File.new("Valid.log", 'a')
+    log.write(dir+"\n")
+    log.close
+end
+
+def main(ispPass)
+    banner = "
+    ▄▄                                                              
+    ▀███▀▀▀██▄   ██         ▀███▀▀▀███                                           
+      ██    ▀██▄              ██    ▀█                                           
+      ██     ▀█████ ▀███▄███  ██   █ ▀███  ▀███  █▀▀▀███ █▀▀▀███  ▄▄█▀██▀███▄███ 
+      ██      ██ ██   ██▀ ▀▀  ██▀▀██   ██    ██  ▀  ███  ▀  ███  ▄█▀   ██ ██▀ ▀▀ 
+      ██     ▄██ ██   ██      ██   █   ██    ██    ███     ███   ██▀▀▀▀▀▀ ██     
+      ██    ▄██▀ ██   ██      ██       ██    ██   ███  ▄  ███  ▄ ██▄    ▄ ██     
+    ▄████████▀ ▄████▄████▄  ▄████▄     ▀████▀███▄███████ ███████  ▀█████▀████▄   
+                                                                                 
+                                                                    ~Lojacops       
+    {A wise man once said, remember to delete full log files...}
+                    
+    "
+    puts banner
+    
+    print "Select a target: "
+    target = gets.chomp
+    if check(target) == true
+            print "Select a wordlist: "
+            wordlist = gets.chomp
+            if File.file?(wordlist) == false
+                print "ERROR: Invalid wordlist, please try again."
+                return false
+            end
+            arr_stuff = Array(File.open(wordlist))
+            ohyes = arr_stuff.map {|x| x.chomp}
+            ohyes.each do |dir|
+                uri = "#{target}/#{dir}/"
+                req = HTTP.get(uri)
+                code = req.code
+                if code == 200
+                    puts "Valid Dir: \"#{dir}\" - Code: #{code}"
+                    log(dir)
+                end
+                if code != 200
+                    puts "Invalid Dir: \"#{dir}\" - Code: #{code}"
+                end
+            end
+    end
+end
+
+main()
