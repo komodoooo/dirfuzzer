@@ -27,7 +27,7 @@ def main
     ▄████████▀ ▄████▄████▄  ▄████▄     ▀████▀███▄███████ ███████  ▀█████▀████▄   
                                                                                  
                                                                     ~Lojacops, Renna       
-    {A wise man once said, remember to delete full log files...}
+    {A wise man once told, remember to delete full log files...}
     "
     puts banner
     begin
